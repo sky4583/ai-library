@@ -44,12 +44,20 @@ MODULE=$1
 ACTION=$2
 VERSION_OVERRIDE=$3
 
-# 支援 "all" 檢查
+# 支援 "all" 檢查 (僅檢查已安裝/active 的模組)
 if [ "$MODULE" == "all" ] && [ "$ACTION" == "check" ]; then
-    log "${BLUE}資訊${NC}" "執行全系統狀態檢查..."
-    for mod_path in modules/*/; do
-        mod=$(basename "$mod_path")
+    log "${BLUE}資訊${NC}" "正在執行已安裝模組的狀態檢查..."
+    if [ ! -s "$VERSION_DB" ]; then
+        log "${YELLOW}提示${NC}" "目前沒有已安裝的模組紀錄。"
+        exit 0
+    fi
+
+    # 從 versions.db 讀取狀態為 active 的模組名稱
+    ACTIVE_MODULES=$(grep "|active|" "$VERSION_DB" | cut -d'|' -f1)
+    
+    for mod in $ACTIVE_MODULES; do
         if [ -f "modules/$mod/check.sh" ]; then
+            log "${BLUE}驗證${NC}" "檢查模組: $mod"
             bash "modules/$mod/check.sh"
         fi
     done
