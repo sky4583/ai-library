@@ -66,6 +66,11 @@ fi
 
 # 將版本覆蓋匯出為環境變數
 export TARGET_VERSION=$VERSION_OVERRIDE
+
+# 強制靜默安裝模式 (適合 AI Agent 執行)
+export DEBIAN_FRONTEND=noninteractive
+export UCF_FORCE_CONFFOLD=1
+
 SCRIPT_PATH="$PROJECT_ROOT/modules/$MODULE/$ACTION.sh"
 
 # 檢查模組與動作是否存在
@@ -94,6 +99,12 @@ if [ $EXIT_CODE -eq 0 ]; then
             echo "$MODULE|$VERSION_STR|active|$CURRENT_DATE" >> "$VERSION_DB"
         fi
         log "${BLUE}資料庫${NC}" "已更新 $VERSION_DB 中的 $MODULE 資訊。"
+
+        # [新增] 安裝後自動進行驗證
+        log "${YELLOW}驗證${NC}" "安裝後自動觸發 [$MODULE] 的狀態檢查..."
+        if [ -f "$PROJECT_ROOT/modules/$MODULE/check.sh" ]; then
+            bash "$PROJECT_ROOT/modules/$MODULE/check.sh"
+        fi
     fi
 else
     log "${RED}失敗${NC}" "模組 [$MODULE] 動作 [$ACTION] 傳回錯誤代碼: $EXIT_CODE"

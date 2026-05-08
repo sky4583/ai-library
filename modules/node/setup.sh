@@ -7,34 +7,35 @@
 
 set -e
 
-# 1. 取得目標版本 (優先使用環境變數中的覆蓋值，其次讀取資料庫)
+# 1. 取得目標版本
 if [ -n "$TARGET_VERSION" ]; then
     VERSION="$TARGET_VERSION"
     echo ">>> 使用前端指定的 Node.js 覆蓋版本: $VERSION"
 else
-    VERSION=$(grep "^node|" "../../versions.db" | cut -d'|' -f2)
-    echo ">>> 使用資料庫預設 Node.js 版本: $VERSION"
+    VERSION="20" # 預設版本
+    echo ">>> 使用預設 Node.js 版本: $VERSION"
 fi
 
 echo ">>> 正在準備安裝 Node.js (Major Version: $VERSION)..."
 
-# 2. 安裝必要依賴
-sudo apt-get update
-sudo apt-get install -y ca-certificates curl gnupg
+# 2. 環境清理
+echo "正在清理舊版 Node.js/npm 相關套件..."
+sudo apt-get remove -y nodejs npm || true
 
-# 3. 匯入 NodeSource GPG 金鑰 (遵照 AGENT_GUIDE.md 使用 /etc/apt/keyrings)
+# 3. 安裝必要依賴
+sudo apt-get update
+sudo apt-get install -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" ca-certificates curl gnupg
+
+# 4. 匯入 NodeSource GPG 金鑰
 sudo install -m 0755 -d /etc/apt/keyrings
 curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | sudo gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg
 sudo chmod a+r /etc/apt/keyrings/nodesource.gpg
 
-# 4. 新增 NodeSource 軟體源
+# 5. 新增 NodeSource 軟體源
 echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_$VERSION.x nodistro main" | sudo tee /etc/apt/sources.list.d/nodesource.list
 
-# 5. 安裝 Node.js
+# 6. 安裝 Node.js (使用靜默參數)
 sudo apt-get update
-sudo apt-get install -y nodejs
+sudo apt-get install -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" nodejs
 
-# 6. 驗證安裝結果
 echo ">>> Node.js 安裝完成！"
-node -v
-npm -v
