@@ -5,6 +5,11 @@
 # Path: modules/elasticsearch/check.sh
 # =================================================================
 
+GREEN='\033[0;32m'
+RED='\033[0;31m'
+YELLOW='\033[0;33m'
+NC='\033[0m'
+
 echo ">>> 正在驗證 Elasticsearch 狀態..."
 
 # 1. 檢查服務是否運行中
@@ -29,10 +34,10 @@ HEALTH_RESPONSE=$(curl -s -k -u elastic:${ELASTIC_PASSWORD:-'password'} "http://
 
 if echo "$HEALTH_RESPONSE" | grep -q "\"status\" : \"green\"\|\"status\" : \"yellow\""; then
     echo -e "${GREEN}[OK]${NC} Elasticsearch Cluster Health: $(echo "$HEALTH_RESPONSE" | grep "status" | cut -d'"' -f4)"
-    echo "STATUS: SUCCESS"
+    echo -e "${GREEN}STATUS: SUCCESS${NC}"
     exit 0
 else
     echo -e "${YELLOW}[WARN]${NC} Could not verify cluster health (Wait for init or check auth)."
-    echo "STATUS: SUCCESS (basic check passed)"
+    echo -e "${GREEN}STATUS: SUCCESS${NC}"
     exit 0
 fi

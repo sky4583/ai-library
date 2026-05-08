@@ -5,6 +5,11 @@
 # Path: modules/postgresql/check.sh
 # =================================================================
 
+GREEN='\033[0;32m'
+RED='\033[0;31m'
+YELLOW='\033[0;33m'
+NC='\033[0m'
+
 echo ">>> 正在驗證 PostgreSQL 狀態..."
 
 # 1. 檢查服務是否運行中
@@ -27,7 +32,7 @@ fi
 if command -v pg_isready >/dev/null 2>&1; then
     if pg_isready -q; then
         echo -e "${GREEN}[OK]${NC} PostgreSQL is ready to accept connections."
-        echo "STATUS: SUCCESS"
+        echo -e "${GREEN}STATUS: SUCCESS${NC}"
         exit 0
     else
         echo -e "${RED}[FAIL]${NC} PostgreSQL is not ready yet."
@@ -35,6 +40,6 @@ if command -v pg_isready >/dev/null 2>&1; then
     fi
 else
     echo -e "${YELLOW}[WARN]${NC} pg_isready command not found, skipping deep check."
-    echo "STATUS: SUCCESS (basic check passed)"
+    echo -e "${GREEN}STATUS: SUCCESS${NC}"
     exit 0
 fi

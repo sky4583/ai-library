@@ -30,10 +30,9 @@ fi
 # 3. 檢查目前使用者權限 (測試免 sudo)
 if docker ps >/dev/null 2>&1; then
     echo -e "${GREEN}[OK]${NC} 目前使用者具備 Docker 執行權限"
+    echo -e "${GREEN}STATUS: SUCCESS${NC}"
+    exit 0
 else
     echo -e "${RED}[WARN]${NC} 無法存取 Docker Socket，可能需要重新登入或使用 sudo"
     exit 2
 fi
-
-echo -e "${GREEN}>>> Docker 驗證通過！${NC}"
-exit 0
