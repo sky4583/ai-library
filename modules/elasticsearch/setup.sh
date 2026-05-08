@@ -12,8 +12,11 @@ if [ -n "$TARGET_VERSION" ]; then
     VERSION="$TARGET_VERSION"
     echo ">>> 使用前端指定的 Elasticsearch 覆蓋版本: $VERSION"
 else
-    VERSION="8" # 預設主版本
-    echo ">>> 使用預設 Elasticsearch 版本: $VERSION"
+    if [ -f "$VERSION_DB" ]; then
+        VERSION=$(grep "^elasticsearch|" "$VERSION_DB" | cut -d'|' -f2)
+    fi
+    VERSION=${VERSION:-"8"}
+    echo ">>> 使用版本: $VERSION"
 fi
 
 echo ">>> 正在準備安裝 Elasticsearch (Major Version: $VERSION)..."
@@ -28,13 +31,13 @@ sudo apt-get install -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::=
 
 # 4. 匯入 Elastic 官方 GPG 金鑰
 sudo install -m 0755 -d /etc/apt/keyrings
-curl -fsSL https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo gpg --dearmor -o /etc/apt/keyrings/elasticsearch-keyring.gpg
+curl -fsSL https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo gpg --batch --yes --dearmor -o /etc/apt/keyrings/elasticsearch-keyring.gpg
 sudo chmod a+r /etc/apt/keyrings/elasticsearch-keyring.gpg
 
 # 5. 新增 Elastic 軟體源
 echo "deb [signed-by=/etc/apt/keyrings/elasticsearch-keyring.gpg] https://artifacts.elastic.co/packages/$VERSION.x/apt stable main" | sudo tee /etc/apt/sources.list.d/elastic-$VERSION.x.list
 
-# 6. 安裝 Elasticsearch (使用靜默參數)
+# 6. 安裝 Elasticsearch
 sudo apt-get update
 sudo apt-get install -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" elasticsearch
 

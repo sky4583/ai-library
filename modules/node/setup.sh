@@ -12,8 +12,11 @@ if [ -n "$TARGET_VERSION" ]; then
     VERSION="$TARGET_VERSION"
     echo ">>> 使用前端指定的 Node.js 覆蓋版本: $VERSION"
 else
-    VERSION="20" # 預設版本
-    echo ">>> 使用預設 Node.js 版本: $VERSION"
+    if [ -f "$VERSION_DB" ]; then
+        VERSION=$(grep "^node|" "$VERSION_DB" | cut -d'|' -f2)
+    fi
+    VERSION=${VERSION:-"20"}
+    echo ">>> 使用版本: $VERSION"
 fi
 
 echo ">>> 正在準備安裝 Node.js (Major Version: $VERSION)..."
@@ -28,13 +31,13 @@ sudo apt-get install -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::=
 
 # 4. 匯入 NodeSource GPG 金鑰
 sudo install -m 0755 -d /etc/apt/keyrings
-curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | sudo gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg
+curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | sudo gpg --batch --yes --dearmor -o /etc/apt/keyrings/nodesource.gpg
 sudo chmod a+r /etc/apt/keyrings/nodesource.gpg
 
 # 5. 新增 NodeSource 軟體源
 echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_$VERSION.x nodistro main" | sudo tee /etc/apt/sources.list.d/nodesource.list
 
-# 6. 安裝 Node.js (使用靜默參數)
+# 6. 安裝 Node.js
 sudo apt-get update
 sudo apt-get install -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" nodejs
 

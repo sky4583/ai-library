@@ -5,10 +5,10 @@
 # 用法: ./engine.sh [模組名稱] [執行動作: setup|check] [版本指定 (選填)]
 # =================================================================
 
-PROJECT_ROOT=$(pwd)
+export PROJECT_ROOT=$(pwd)
 LOG_DIR="$PROJECT_ROOT/logs"
 LOG_FILE="$LOG_DIR/engine.log"
-VERSION_DB="$PROJECT_ROOT/versions.db"
+export VERSION_DB="$PROJECT_ROOT/versions.db"
 
 # 確保日誌目錄與版本資料庫存在
 mkdir -p "$LOG_DIR"
