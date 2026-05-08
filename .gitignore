@@ -1,0 +1,22 @@
+﻿# Windows system files
+[Dd]esktop.ini
+thumbs.db
+Thumbs.db
+ehthumbs.db
+`$RECYCLE.BIN/
+
+# Logs and databases
+*.log
+*.sql
+*.sqlite
+
+# IDEs and editors
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Project specific
+documents/
+# 如果 versions.db 是動態產生的狀態，可取消註解下方這行
+# versions.db

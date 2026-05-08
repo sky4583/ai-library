@@ -1,0 +1,8 @@
+# AI Library Version Registry
+# Schema: component_name | version | status | last_updated
+
+docker|pending|inactive|never
+postgresql|16|inactive|never
+nginx|1.26|inactive|never
+node|20|inactive|never
+elasticsearch|8|inactive|never
